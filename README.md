@@ -23,16 +23,30 @@ This project demonstrates how to set up and run GitHub Actions workflows locally
 .
 ├── .github/
 │   └── workflows/
-│       └── test.yml      # GitHub Actions workflow file
-└── README.md             # This file
+│       ├── test.yml          # Basic GitHub Actions workflow file
+│       ├── check-admin.yml   # Admin permission check workflow
+│       └── test-act.yml      # Test workflow for act workflow_dispatch
+└── README.md                 # This file
 ```
 
 ## Workflow Configuration
 
-The project includes a basic workflow file (`.github/workflows/test.yml`) that:
-- Triggers on push and pull request events to the main branch
-- Runs on Ubuntu latest
-- Performs a simple "Hello, world!" test
+The project includes several workflow files:
+- `test.yml`: Basic workflow that triggers on push and pull request events
+- `check-admin.yml`: Workflow that checks user permissions
+- `test-act.yml`: Test workflow for workflow_dispatch events
+
+### Testing workflow_dispatch with act
+
+To test the workflow_dispatch event locally, you can use the test workflow:
+
+```bash
+# Run with default input
+act -W .github/workflows/test-act.yml -e <(echo '{"ref": "main", "inputs": {"test_input": "default value"}}') --container-architecture linux/amd64
+
+# Run with custom input
+act -W .github/workflows/test-act.yml -e <(echo '{"ref": "main", "inputs": {"test_input": "custom value"}}') --container-architecture linux/amd64
+```
 
 ## Running Workflows Locally
 
@@ -59,6 +73,7 @@ The project includes a basic workflow file (`.github/workflows/test.yml`) that:
   ```bash
   act push              # Simulate push event
   act pull_request      # Simulate pull request event
+  act -W .github/workflows/check-admin.yml -e <(echo '{"ref": "main", "inputs": {}}') --container-architecture linux/amd64  # Run workflow_dispatch event
   ```
 
 - Run on specific branch:
@@ -104,7 +119,6 @@ The project includes a basic workflow file (`.github/workflows/test.yml`) that:
      ```
 
 ## Limitations
-
 - Some GitHub Actions features might not work exactly the same locally
 - Secrets and environment variables need to be configured separately
 - Some third-party actions might not be fully compatible
@@ -117,4 +131,4 @@ The project includes a basic workflow file (`.github/workflows/test.yml`) that:
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE). 
+This project is open source and available under the [MIT License](LICENSE).

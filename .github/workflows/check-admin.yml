@@ -1,0 +1,45 @@
+name: Admin Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check user permission
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const checkUserPermission = async () => {
+              try {
+                const repositoryName = process.env.GITHUB_REPOSITORY;
+                const actor = process.env.GITHUB_ACTOR;
+                
+                console.log(`🔔 Workflow triggered by user: ${actor}`);
+                console.log(`📋 Repository: ${repositoryName}`);
+                
+                const apiUrl = `https://api.github.com/repos/${repositoryName}/collaborators/${actor}/permission`;
+                
+                const response = await github.request(apiUrl, {
+                  headers: {
+                    authorization: `token ${process.env.GITHUB_TOKEN}`
+                  }
+                });
+                
+                const permission = response.data.permission;
+                
+                if (permission === "admin") {
+                  console.log(`✅ User ${actor} is admin. Proceeding with workflow.`);
+                  return true;
+                } else {
+                  console.log(`❌ User ${actor} is not admin. Permission level: ${permission}. Cancelling workflow.`);
+                  return core.setFailed(`User ${actor} is not admin`);
+                }
+              } catch (error) {
+                console.error(`Error checking permissions: ${error.message}`);
+                return core.setFailed(error.message);
+              }
+            };
+            
+            return checkUserPermission();

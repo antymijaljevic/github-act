@@ -1,0 +1,26 @@
+name: Test act workflow_dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_input:
+        description: 'Test input for workflow'
+        required: true
+        default: 'default value'
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print workflow information
+        run: |
+          echo "🎉 Workflow triggered successfully!"
+          echo "📋 Repository: ${{ github.repository }}"
+          echo "👤 Actor: ${{ github.actor }}"
+          echo "📝 Input value: ${{ github.event.inputs.test_input }}"
+          echo "🌿 Branch: ${{ github.ref }}"
+          echo "🔄 Run ID: ${{ github.run_id }}" 
